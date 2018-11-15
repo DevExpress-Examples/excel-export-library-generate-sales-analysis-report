@@ -1,3 +1,9 @@
+<!-- default file list -->
+*Files to look at*:
+
+* [Form1.cs](./CS/XLExportExample/Form1.cs) (VB: [Form1.vb](./VB/XLExportExample/Form1.vb))
+* [SalesData.cs](./CS/XLExportExample/SalesData.cs) (VB: [SalesData.vb](./VB/XLExportExample/SalesData.vb))
+<!-- default file list end -->
 # How to use the Excel Export API to perform a sales analysis 
 
 
