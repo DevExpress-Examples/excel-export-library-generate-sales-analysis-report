@@ -1,4 +1,4 @@
-﻿Imports DevExpress.Export.Xl
+Imports DevExpress.Export.Xl
 Imports DevExpress.XtraExport.Csv
 Imports System
 Imports System.Collections.Generic
@@ -9,13 +9,18 @@ Imports System.IO
 Imports System.Windows.Forms
 
 Namespace XLExportExample
-    Partial Public Class Form1
+
+    Public Partial Class Form1
         Inherits Form
 
-        Private sales As List(Of SalesData) = SalesRepository.GetSalesData()
+        Private sales As List(Of SalesData) = GetSalesData()
+
         Private headerRowFormatting As XlCellFormatting
+
         Private evenRowFormatting As XlCellFormatting
+
         Private oddRowFormatting As XlCellFormatting
+
         Private totalRowFormatting As XlCellFormatting
 
         Public Sub New()
@@ -30,12 +35,10 @@ Namespace XLExportExample
             evenRowFormatting.Font.Name = "Century Gothic"
             evenRowFormatting.Font.SchemeStyle = XlFontSchemeStyles.None
             evenRowFormatting.Alignment = XlCellAlignment.FromHV(XlHorizontalAlignment.General, XlVerticalAlignment.Center)
-
             ' Specify formatting settings for the odd rows.
             oddRowFormatting = New XlCellFormatting()
             oddRowFormatting.CopyFrom(evenRowFormatting)
             oddRowFormatting.Fill = XlFill.SolidFill(XlColor.FromTheme(XlThemeColor.Light1, -0.15))
-
             ' Specify formatting settings for the header row.
             headerRowFormatting = New XlCellFormatting()
             headerRowFormatting.CopyFrom(evenRowFormatting)
@@ -47,7 +50,6 @@ Namespace XLExportExample
             headerRowFormatting.Border.TopLineStyle = XlBorderLineStyle.Medium
             headerRowFormatting.Border.BottomColor = XlColor.FromTheme(XlThemeColor.Dark1, 0.0)
             headerRowFormatting.Border.BottomLineStyle = XlBorderLineStyle.Medium
-
             ' Specify formatting settings for the total row.
             totalRowFormatting = New XlCellFormatting()
             totalRowFormatting.CopyFrom(evenRowFormatting)
@@ -55,60 +57,42 @@ Namespace XLExportExample
         End Sub
 
         ' Export the document to XLSX format.
-        Private Sub btnExportToXLSX_Click(ByVal sender As Object, ByVal e As EventArgs) Handles btnExportToXLSX.Click
+        Private Sub btnExportToXLSX_Click(ByVal sender As Object, ByVal e As EventArgs)
             Dim fileName As String = GetSaveFileName("Excel Workbook files(*.xlsx)|*.xlsx", "Document.xlsx")
-            If String.IsNullOrEmpty(fileName) Then
-                Return
-            End If
-            If ExportToFile(fileName, XlDocumentFormat.Xlsx) Then
-                ShowFile(fileName)
-            End If
+            If String.IsNullOrEmpty(fileName) Then Return
+            If ExportToFile(fileName, XlDocumentFormat.Xlsx) Then ShowFile(fileName)
         End Sub
 
         ' Export the document to XLS format.
-        Private Sub btnExportToXLS_Click(ByVal sender As Object, ByVal e As EventArgs) Handles btnExportToXLS.Click
+        Private Sub btnExportToXLS_Click(ByVal sender As Object, ByVal e As EventArgs)
             Dim fileName As String = GetSaveFileName("Excel 97-2003 Workbook files(*.xls)|*.xls", "Document.xls")
-            If String.IsNullOrEmpty(fileName) Then
-                Return
-            End If
-            If ExportToFile(fileName, XlDocumentFormat.Xls) Then
-                ShowFile(fileName)
-            End If
+            If String.IsNullOrEmpty(fileName) Then Return
+            If ExportToFile(fileName, XlDocumentFormat.Xls) Then ShowFile(fileName)
         End Sub
 
         ' Export the document to CSV format.
-        Private Sub btnExportToCSV_Click(ByVal sender As Object, ByVal e As EventArgs) Handles btnExportToCSV.Click
+        Private Sub btnExportToCSV_Click(ByVal sender As Object, ByVal e As EventArgs)
             Dim fileName As String = GetSaveFileName("CSV (Comma delimited files)(*.csv)|*.csv", "Document.csv")
-            If String.IsNullOrEmpty(fileName) Then
-                Return
-            End If
-            If ExportToFile(fileName, XlDocumentFormat.Csv) Then
-                ShowFile(fileName)
-            End If
+            If String.IsNullOrEmpty(fileName) Then Return
+            If ExportToFile(fileName, XlDocumentFormat.Csv) Then ShowFile(fileName)
         End Sub
 
         Private Function GetSaveFileName(ByVal filter As String, ByVal defaulName As String) As String
             saveFileDialog1.Filter = filter
             saveFileDialog1.FileName = defaulName
-            If saveFileDialog1.ShowDialog() <> System.Windows.Forms.DialogResult.OK Then
-                Return Nothing
-            End If
+            If saveFileDialog1.ShowDialog() <> DialogResult.OK Then Return Nothing
             Return saveFileDialog1.FileName
         End Function
 
         Private Sub ShowFile(ByVal fileName As String)
-            If Not File.Exists(fileName) Then
-                Return
-            End If
-            Dim dResult As DialogResult = MessageBox.Show(String.Format("Do you want to open the resulting file?", fileName), Me.Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question)
-            If dResult = System.Windows.Forms.DialogResult.Yes Then
-                Process.Start(fileName)
-            End If
+            If Not File.Exists(fileName) Then Return
+            Dim dResult As DialogResult = MessageBox.Show(String.Format("Do you want to open the resulting file?", fileName), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question)
+            If dResult = DialogResult.Yes Then Call Process.Start(fileName)
         End Sub
 
         Private Function ExportToFile(ByVal fileName As String, ByVal documentFormat As XlDocumentFormat) As Boolean
             Try
-                Using stream As New FileStream(fileName, FileMode.Create)
+                Using stream As FileStream = New FileStream(fileName, FileMode.Create)
                     ' Create an exporter instance. 
                     Dim exporter As IXlExporter = XlExport.CreateExporter(documentFormat)
                     ' Create a new document and begin to write it to the specified stream.
@@ -117,9 +101,10 @@ Namespace XLExportExample
                         GenerateDocument(document)
                     End Using
                 End Using
+
                 Return True
             Catch ex As Exception
-                MessageBox.Show(ex.Message, Me.Text, MessageBoxButtons.OK, MessageBoxIcon.Error)
+                MessageBox.Show(ex.Message, Text, MessageBoxButtons.OK, MessageBoxIcon.Error)
                 Return False
             End Try
         End Function
@@ -127,7 +112,6 @@ Namespace XLExportExample
         Private Sub GenerateDocument(ByVal document As IXlDocument)
             ' Specify the document culture.
             document.Options.Culture = CultureInfo.CurrentCulture
-
             ' Specify options for exporting the document in CSV format.
             Dim csvOptions As CsvDataAwareExporterOptions = TryCast(document.Options, CsvDataAwareExporterOptions)
             If csvOptions IsNot Nothing Then
@@ -140,46 +124,35 @@ Namespace XLExportExample
             Using sheet As IXlSheet = document.CreateSheet()
                 ' Specify the worksheet name.
                 sheet.Name = "Annual Sales"
-
                 ' Specify page settings.
                 sheet.PageSetup = New XlPageSetup()
                 ' Scale the print area to fit to one page wide.
                 sheet.PageSetup.FitToPage = True
                 sheet.PageSetup.FitToWidth = 1
                 sheet.PageSetup.FitToHeight = 0
-
                 ' Generate worksheet columns.
                 GenerateColumns(sheet)
-
                 ' Add the title to the documents exported to the XLSX and XLS formats.
-                If document.Options.DocumentFormat <> XlDocumentFormat.Csv Then
-                    GenerateTitle(sheet)
-                End If
-
+                If document.Options.DocumentFormat <> XlDocumentFormat.Csv Then GenerateTitle(sheet)
                 ' Create the header row.
                 GenerateHeaderRow(sheet)
-
                 Dim firstDataRowIndex As Integer = sheet.CurrentRowIndex
-
                 ' Create the data rows.
                 For i As Integer = 0 To sales.Count - 1
-                    GenerateDataRow(sheet, sales(i), (i + 1) = sales.Count)
-                Next i
+                    GenerateDataRow(sheet, sales(i), i + 1 = sales.Count)
+                Next
 
                 ' Create the total row.
                 GenerateTotalRow(sheet, firstDataRowIndex)
-
                 ' Specify the data range to be printed.
                 sheet.PrintArea = sheet.DataRange
-
                 ' Create conditional formatting rules to be applied to worksheet data.  
                 GenerateConditionalFormatting(sheet, firstDataRowIndex)
             End Using
         End Sub
 
         Private Sub GenerateColumns(ByVal sheet As IXlSheet)
-            Dim numberFormat As XlNumberFormat ="#,##0,,""M"""
-
+            Dim numberFormat As XlNumberFormat = "#,##0,,""M"""
             ' Create the "State" column and set its width.
             Using column As IXlColumn = sheet.CreateColumn()
                 column.WidthInPixels = 140
@@ -212,7 +185,7 @@ Namespace XLExportExample
 
         Private Sub GenerateTitle(ByVal sheet As IXlSheet)
             ' Specify formatting settings for the document title.
-            Dim formatting As New XlCellFormatting()
+            Dim formatting As XlCellFormatting = New XlCellFormatting()
             formatting.Font = New XlFont()
             formatting.Font.Name = "Calibri Light"
             formatting.Font.SchemeStyle = XlFontSchemeStyles.None
@@ -221,28 +194,27 @@ Namespace XLExportExample
             formatting.Border = New XlBorder()
             formatting.Border.BottomColor = XlColor.FromTheme(XlThemeColor.Dark1, 0.35)
             formatting.Border.BottomLineStyle = XlBorderLineStyle.Medium
-
             ' Add the document title.
             Using row As IXlRow = sheet.CreateRow()
                 Using cell As IXlCell = row.CreateCell()
                     cell.Value = "SALES 2014"
                     cell.Formatting = formatting
                 End Using
+
                 ' Create four empty cells with the title formatting applied.
-                For i As Integer = 0 To 3
+                For i As Integer = 0 To 4 - 1
                     Using cell As IXlCell = row.CreateCell()
                         cell.Formatting = formatting
                     End Using
-                Next i
+                Next
             End Using
 
             ' Skip one row before starting to generate data rows.
             sheet.SkipRows(1)
-
         End Sub
 
         Private Sub GenerateHeaderRow(ByVal sheet As IXlSheet)
-            Dim columnNames() As String = { "State", "Sales", "Sales vs Target", "Profit", "Market Share" }
+            Dim columnNames As String() = New String() {"State", "Sales", "Sales vs Target", "Profit", "Market Share"}
             ' Create the header row and set its height.
             Using row As IXlRow = sheet.CreateRow()
                 row.HeightInPixels = 25
@@ -255,9 +227,8 @@ Namespace XLExportExample
             ' Create the data row to display sales information for the specific state.
             Using row As IXlRow = sheet.CreateRow()
                 row.HeightInPixels = 25
-
                 ' Specify formatting settings to be applied to the data rows to shade alternate rows. 
-                Dim formatting As New XlCellFormatting()
+                Dim formatting As XlCellFormatting = New XlCellFormatting()
                 formatting.CopyFrom(If(row.RowIndex Mod 2 = 0, evenRowFormatting, oddRowFormatting))
                 ' Set the bottom border for the last data row.
                 If isLastRow Then
@@ -302,7 +273,6 @@ Namespace XLExportExample
             ' Create the total row and set its height.
             Using row As IXlRow = sheet.CreateRow()
                 row.HeightInPixels = 25
-
                 ' Create the first cell in the row and apply specific formatting settings to this cell.
                 Using cell As IXlCell = row.CreateCell()
                     cell.ApplyFormatting(totalRowFormatting)
@@ -331,11 +301,11 @@ Namespace XLExportExample
 
         Private Sub GenerateConditionalFormatting(ByVal sheet As IXlSheet, ByVal firstDataRowIndex As Integer)
             ' Create an instance of the XlConditionalFormatting class to define a new rule.
-            Dim formatting As New XlConditionalFormatting()
+            Dim formatting As XlConditionalFormatting = New XlConditionalFormatting()
             ' Specify the cell range to which the conditional formatting rule should be applied (B4:B38).
             formatting.Ranges.Add(XlCellRange.FromLTRB(1, firstDataRowIndex, 1, sheet.CurrentRowIndex - 2))
             ' Create the rule to compare values in the "Sales" column using data bars. 
-            Dim rule1 As New XlCondFmtRuleDataBar()
+            Dim rule1 As XlCondFmtRuleDataBar = New XlCondFmtRuleDataBar()
             ' Specify the color of data bars. 
             rule1.FillColor = XlColor.FromTheme(XlThemeColor.Accent1, 0.4)
             ' Set the solid fill type.
@@ -343,13 +313,12 @@ Namespace XLExportExample
             formatting.Rules.Add(rule1)
             ' Add the specified rule to the worksheet collection of conditional formatting rules.
             sheet.ConditionalFormattings.Add(formatting)
-
             ' Create an instance of the XlConditionalFormatting class to define new rules.
             formatting = New XlConditionalFormatting()
             ' Specify the cell range to which the conditional formatting rules should be applied (C4:C38).
             formatting.Ranges.Add(XlCellRange.FromLTRB(2, firstDataRowIndex, 2, sheet.CurrentRowIndex - 2))
             ' Create the rule to identify negative values in the "Sales vs Target" column.
-            Dim rule2 As New XlCondFmtRuleCellIs()
+            Dim rule2 As XlCondFmtRuleCellIs = New XlCondFmtRuleCellIs()
             ' Specify the relational operator to be used in the conditional formatting rule.
             rule2.Operator = XlCondFmtOperator.LessThan
             ' Set the threshold value.
@@ -359,7 +328,7 @@ Namespace XLExportExample
             rule2.Formatting = New XlFont() With {.Color = Color.DarkRed}
             formatting.Rules.Add(rule2)
             ' Create the rule to identify top five values in the "Sales vs Target" column.
-            Dim rule3 As New XlCondFmtRuleTop10()
+            Dim rule3 As XlCondFmtRuleTop10 = New XlCondFmtRuleTop10()
             rule3.Rank = 5
             ' Specify formatting options to be applied to cells if the condition is true.
             ' Set the font color to dark green.
@@ -367,13 +336,12 @@ Namespace XLExportExample
             formatting.Rules.Add(rule3)
             ' Add the specified rules to the worksheet collection of conditional formatting rules.
             sheet.ConditionalFormattings.Add(formatting)
-
             ' Create an instance of the XlConditionalFormatting class to define a new rule.
             formatting = New XlConditionalFormatting()
             ' Specify the cell range to which the conditional formatting rules should be applied (D4:D38).
             formatting.Ranges.Add(XlCellRange.FromLTRB(3, firstDataRowIndex, 3, sheet.CurrentRowIndex - 2))
             ' Create the rule to compare values in the "Profit" column using data bars. 
-            Dim rule4 As New XlCondFmtRuleDataBar()
+            Dim rule4 As XlCondFmtRuleDataBar = New XlCondFmtRuleDataBar()
             ' Specify the color of data bars. 
             rule4.FillColor = Color.FromArgb(99, 195, 132)
             ' Specify the positive bar border color.
@@ -387,13 +355,12 @@ Namespace XLExportExample
             formatting.Rules.Add(rule4)
             ' Add the specified rule to the worksheet collection of conditional formatting rules.
             sheet.ConditionalFormattings.Add(formatting)
-
             ' Create an instance of the XlConditionalFormatting class to define a new rule.
             formatting = New XlConditionalFormatting()
             ' Specify the cell range to which the conditional formatting rules should be applied (E4:E38).
             formatting.Ranges.Add(XlCellRange.FromLTRB(4, firstDataRowIndex, 4, sheet.CurrentRowIndex - 2))
             ' Create the rule to apply a specific icon from the three traffic lights icon set to each cell in the "Market Share" column based on its value. 
-            Dim rule5 As New XlCondFmtRuleIconSet()
+            Dim rule5 As XlCondFmtRuleIconSet = New XlCondFmtRuleIconSet()
             rule5.IconSetType = XlCondFmtIconSetType.TrafficLights3
             formatting.Rules.Add(rule5)
             ' Add the specified rule to the worksheet collection of conditional formatting rules.
