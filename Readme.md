@@ -25,6 +25,9 @@ In particular, this example introduces API properties and methods used to perfor
 - Create a rule that formats cells whose values meet the condition expressed by the relational operator
 - Use formulas to calculate subtotals
 
+> [!Important]  
+> The Universal Subscription or an additional Office File API Subscription is required to use this example in production code. For pricing information, please refer to the [DevExpress Subscription](https://www.devexpress.com/Subscriptions/) page. 
+
 ## Files to Review
 
 * [Form1.cs](./CS/XLExportExample/Form1.cs) (VB: [Form1.vb](./VB/XLExportExample/Form1.vb))
